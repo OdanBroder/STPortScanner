@@ -7,7 +7,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-
 namespace OnlyExe_STPortScanner
 {
     public class ScannerStatic
@@ -17,7 +16,6 @@ namespace OnlyExe_STPortScanner
         private static StringBuilder m_sb_buffer = new StringBuilder();
         private static Dictionary<string, byte> m_dic_ip = new Dictionary<string, byte>();
         private static object m_obj_sync = new object();
-
         static ScannerStatic()
         {
             m_dic_ip = new Dictionary<string, byte>();
@@ -37,12 +35,10 @@ namespace OnlyExe_STPortScanner
             temp |= (num >> 24) & 0x000000FF;
             return temp;
         }
-
         public static uint IPToINT(string strIP)
         {
             return ScannerStatic.IPToINT(strIP, false);
         }
-
         public static uint IPToINT(string strIP, bool bBig)
         {
             uint num = 0;
@@ -69,9 +65,7 @@ namespace OnlyExe_STPortScanner
             }
             return num;
         }
-
         //=======================================================
-
         public static void ShowInfo()
         {
             string strText = "-h     Host ......................................... [default:not specified]\r\n"
@@ -161,7 +155,6 @@ namespace OnlyExe_STPortScanner
             Console.WriteLine(" -2020-03-19----------------Powered by -> Crystal_lz-----------------ST233.COM-");
             Console.ForegroundColor = clr;
         }
-
         public static void GetIpRange(string[] strIps)
         {
             List<Range> lst = new List<Range>();
@@ -225,7 +218,6 @@ namespace OnlyExe_STPortScanner
             }
             ScannerConfiger.IPRange = lst;
         }
-
         public static void GetPortList(string[] strPorts)
         {
             List<int> lst = new List<int>();
@@ -257,7 +249,6 @@ namespace OnlyExe_STPortScanner
             }
             ScannerConfiger.PortList = lst.ToArray();
         }
-
         public static PortScanner InitScanner(string[] args, ProbeConfiger pc)
         {
             PortScanner ps = null;
@@ -376,7 +367,6 @@ namespace OnlyExe_STPortScanner
             ScannerStatic.InitWriter();
             return ps;
         }
-
         public static void OutToFile(string strIP, string strPort, string strType, string strProto, string strBanner, int nLine, byte[] byBuffer, int nLen)
         {
             if (m_writer == null) return;
@@ -390,7 +380,6 @@ namespace OnlyExe_STPortScanner
                 m_writer.Flush();
             }
         }
-
         private static void InitWriter()
         {
             if (m_writer != null && ScannerConfiger.OutputType == "CSV")
@@ -433,7 +422,6 @@ namespace OnlyExe_STPortScanner
                 if (m_sb_buffer.Length != 0) m_writer.WriteLine(m_sb_buffer.ToString(0, m_sb_buffer.Length - 1));
             }
         }
-
         private static string GetCSVString(string strIP, string strPort, string strType, string strProto, string strBanner, int nLine, byte[] byBuffer, int nLen)
         {
             lock (m_obj_sync)
@@ -478,7 +466,6 @@ namespace OnlyExe_STPortScanner
             }
             return "";
         }
-
         private static string GetJSONString(string strIP, string strPort, string strType, string strProto, string strBanner, int nLine, byte[] byBuffer, int nLen)
         {
             lock (m_obj_sync)
@@ -531,7 +518,6 @@ namespace OnlyExe_STPortScanner
             return "{}";
         }
     }
-
     public struct Range
     {
         public uint Start;

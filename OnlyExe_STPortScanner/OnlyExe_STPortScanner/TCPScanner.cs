@@ -6,7 +6,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-
 namespace OnlyExe_STPortScanner
 {
     public class TCPScanner : PortScanner
@@ -17,7 +16,6 @@ namespace OnlyExe_STPortScanner
         private Queue<SocketAsyncEventArgs> m_que_sae;
         private HashSet<TCPScanTaskInfo> m_hs_task_running;
         private Thread m_thread_timeout;
-
         public TCPScanner(int nMaxTask, ProbeConfiger probes)
         {
             if (nMaxTask > 60000 || nMaxTask < 1) throw new ArgumentOutOfRangeException("the MaxTask must be between 1 and 30000");
@@ -41,7 +39,6 @@ namespace OnlyExe_STPortScanner
             m_thread_timeout.IsBackground = true;
             m_thread_timeout.Start();
         }
-
         protected override uint OnScan(int nPort, EndPoint endPoint, int nProbes, int nTimeout, int nRetry, int nTotalTimeout, bool bUseNullProbe)
         {
             lock (m_obj_sync)
@@ -55,7 +52,6 @@ namespace OnlyExe_STPortScanner
             this.StartConnect(ti);
             return ti.TaskID;
         }
-
         private void StartConnect(TCPScanTaskInfo ti)
         {
             if (ti.Socket != null) base.CloseSocket(ti.Socket);
@@ -77,14 +73,12 @@ namespace OnlyExe_STPortScanner
                 this.EndTask(ti, new ScanEventArgs(ti.TaskID, ti.EndPoint, ti.CanConnect, "[SOCKET-CONNECT]-" + ex.Message));
             }
         }
-
         private Socket GetNextSocket(int nTimeout)
         {
             Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             sock.SendTimeout = sock.ReceiveTimeout = nTimeout;
             return sock;
         }
-
         private SocketAsyncEventArgs PopSAE()
         {
             SocketAsyncEventArgs sae = null;
@@ -99,10 +93,8 @@ namespace OnlyExe_STPortScanner
             sae = new SocketAsyncEventArgs();
             sae.Completed += new EventHandler<SocketAsyncEventArgs>(IO_Completed);
             sae.SetBuffer(new byte[2048], 0, 2048);
-
             return sae;
         }
-
         private void PushSAE(SocketAsyncEventArgs sae)
         {
             lock (m_obj_sync)
@@ -111,7 +103,6 @@ namespace OnlyExe_STPortScanner
                 m_que_sae.Enqueue(sae);
             }
         }
-
         private TCPScanTaskInfo CreateTaskInfo(int nPort, EndPoint endPoint, int nProbes, int nTimeout, int nRetry, int nTotalTimeout, bool bUseNullProbes)
         {
             TCPScanTaskInfo ti = null;
@@ -139,7 +130,6 @@ namespace OnlyExe_STPortScanner
                 ti.CurrentProbe = ti.SendProbes.Dequeue();
             return ti;
         }
-
         private void IO_Completed(object sender, SocketAsyncEventArgs e)
         {
             switch (e.LastOperation)
@@ -155,7 +145,6 @@ namespace OnlyExe_STPortScanner
                     break;
             }
         }
-
         private void ProcessConnect(SocketAsyncEventArgs e)
         {
             TCPScanTaskInfo ti = e.UserToken as TCPScanTaskInfo;
@@ -218,14 +207,12 @@ namespace OnlyExe_STPortScanner
                 this.PushSAE(e);
             }
         }
-
         private void ProcessSend(SocketAsyncEventArgs e)
         {
             TCPScanTaskInfo ti = e.UserToken as TCPScanTaskInfo;
             ti.LastTime = DateTime.Now;
             this.PushSAE(e);
         }
-
         private void ProcessRecv(SocketAsyncEventArgs e)
         {
             TCPScanTaskInfo ti = e.UserToken as TCPScanTaskInfo;
@@ -251,7 +238,6 @@ namespace OnlyExe_STPortScanner
             }
             this.EndTask(ti, new ScanEventArgs(ti.TaskID, ti.EndPoint, mr.Name, mr.RegexLine, mr.DataString, e.Buffer, e.BytesTransferred));
         }
-
         private void EndTask(TCPScanTaskInfo ti, ScanEventArgs e)
         {
             base.CloseSocket(ti.Socket);
@@ -265,7 +251,6 @@ namespace OnlyExe_STPortScanner
             base.OnCompleted(e);
             m_se.Release();
         }
-
         private void CheckTimeout()
         {
             DateTime dt = DateTime.Now;
@@ -296,7 +281,6 @@ namespace OnlyExe_STPortScanner
                 if (bDisposed) break;
             }
         }
-
         public override void Dispose()
         {
             lock (m_obj_sync)

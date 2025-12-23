@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using System.IO;
 using System.IO.Compression;
-
 namespace OnlyExe_STPortScanner
 {
     public class ConfigerHelper
@@ -21,7 +19,6 @@ namespace OnlyExe_STPortScanner
                 return ms.ToArray();
             }
         }
-
         public static byte[] DeCompress(byte[] byData)
         {
             int nLen = 0;
@@ -41,7 +38,6 @@ namespace OnlyExe_STPortScanner
                 return ms_new.ToArray();
             }
         }
-
         public static void CreateConfigFile(string strFileName, bool bProbes)
         {
             using (FileStream fs = new FileStream(strFileName, FileMode.Create))

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
 using System.IO;
 using System.Text.RegularExpressions;
-
 namespace OnlyExe_STPortScanner
 {
     public class ProbeConfiger
@@ -35,34 +33,25 @@ namespace OnlyExe_STPortScanner
 # PROBE_REGEX [http] {(?i)\<html\>}
 # **[PROBE_E]**";
         private Dictionary<int, List<ProbeInfo>> _ProbesDictionary;
-
         public Dictionary<int, List<ProbeInfo>> ProbesDictionary
         {
             get { return this._ProbesDictionary; }
         }
-
         private List<ProbeInfo> _AllProbes;
-
         public List<ProbeInfo> AllProbes
         {
             get { return _AllProbes; }
         }
-
         private Dictionary<int, string> _DefaultProtocol;
-
         public Dictionary<int, string> DefaultProtocol
         {
             get { return _DefaultProtocol; }
         }
-
         public object m_obj_sync = new object();
-
         public ProbeConfiger(string strConfigProbes, string strConfigDefault)
             : this(strConfigProbes, strConfigDefault, false)
         {
-
         }
-
         public ProbeConfiger(string strConfigProbes, string strConfigDefault, bool bNmapProbesConfig)
         {
             if (bNmapProbesConfig)
@@ -71,7 +60,6 @@ namespace OnlyExe_STPortScanner
                 this.LoadProbeConfig(strConfigProbes);
             this.LoadDefportsConfig(strConfigDefault);
         }
-
         public void LoadDefportsConfig(string strConfigDefault)
         {
             string[] strLines = strConfigDefault.Split('\n');
@@ -90,7 +78,6 @@ namespace OnlyExe_STPortScanner
             }
             lock (m_obj_sync) this._DefaultProtocol = dic;
         }
-
         public void LoadProbeConfig(string strConfigProbes)
         {
             string[] strLines = strConfigProbes.Split('\n');
@@ -185,14 +172,11 @@ namespace OnlyExe_STPortScanner
                 this._AllProbes = lst;
             }
         }
-
         public void LoadNmapProbeConfig(string strNmapProbesConfig)
         {
             this.LoadProbeConfig(ProbeConfiger.ConvertNmapProbe(strNmapProbesConfig));
         }
-
         public Queue<ProbeInfo> GetProbesQueue(ProbeType type, int nPort) { return this.GetProbesQueue(type, nPort, 0); }
-
         public Queue<ProbeInfo> GetProbesQueue(ProbeType type, int nPort, int nCount)
         {
             int nTimes = 0;
@@ -223,17 +207,14 @@ namespace OnlyExe_STPortScanner
             //}
             return que;
         }
-
         public MatchResult MatchData(byte[] byBuffer, int nLen, ProbeType type)
         {
             return this.MatchData(byBuffer, nLen, 0, type, null);
         }
-
         public MatchResult MatchData(byte[] byBuffer, int nLen, int nPort, ProbeType type)
         {
             return this.MatchData(byBuffer, nLen, nPort, type, null);
         }
-
         public MatchResult MatchData(byte[] byBuffer, int nLen, int nPort, ProbeType type, ProbeInfo probeInfo)
         {
             StringBuilder sb_m = new StringBuilder();
@@ -247,7 +228,6 @@ namespace OnlyExe_STPortScanner
             }
             strMatch = sb_m.ToString();
             strResult = sb_r.ToString();
-
             var probesDic = this._ProbesDictionary;
             if (probeInfo != null)
             {
@@ -305,7 +285,6 @@ namespace OnlyExe_STPortScanner
             strNmapProbesConfig = Regex.Replace(strNmapProbesConfig, @"^\s*sslports\s*([\d,\-]*)", "PROBE_PORTS    [$1]", RegexOptions.Multiline | RegexOptions.IgnoreCase);
             return m_strHead.Replace("{DATA}", strData) + "\r\n" + strNmapProbesConfig + "\r\n**[PROBE_E]**\r\n#Convert from [nmap-service-probes] by Crystal_lz " + strData;
         }
-
         private static string ByteToChar(byte by)
         {
             if (by == 0) return "\\0";
@@ -320,7 +299,6 @@ namespace OnlyExe_STPortScanner
             if (by >= 32 && by <= 126) return ((char)by).ToString();
             return "\\x" + by.ToString("X2");
         }
-
         public static byte[] StringToByte(string strText)
         {
             List<byte> lst = new List<byte>();
@@ -397,7 +375,6 @@ namespace OnlyExe_STPortScanner
                 return _Ports;
             }
         }
-
         private bool _IsTcp;
         /// <summary>
         /// 该探测项是否是用于探测TCP协议
@@ -408,7 +385,6 @@ namespace OnlyExe_STPortScanner
             get { return _IsTcp; }
             set { _IsTcp = value; }
         }
-
         private int _Index = int.MaxValue;
         /// <summary>
         /// 该探测项优先级
@@ -419,7 +395,6 @@ namespace OnlyExe_STPortScanner
             get { return _Index; }
             set { _Index = value; }
         }
-
         private byte[] _Data;
         /// <summary>
         /// 该探测项需要发送是数据包列表
@@ -430,7 +405,6 @@ namespace OnlyExe_STPortScanner
             get { return _Data; }
             set { _Data = value; }
         }
-
         private List<RegexInfo> _RegexList;
         /// <summary>
         /// 匹配banner正则列表
@@ -443,7 +417,6 @@ namespace OnlyExe_STPortScanner
                 return _RegexList;
             }
         }
-
         public struct RegexInfo
         {
             /// <summary>
@@ -460,30 +433,23 @@ namespace OnlyExe_STPortScanner
             public Regex Regex;
         }
     }
-
     public struct MatchResult
     {
         private string _Name;
-
         public string Name
         {
             get { return _Name; }
         }
-
         private string _DataString;
-
         public string DataString
         {
             get { return _DataString; }
         }
-
         private int _RegexLine;
-
         public int RegexLine
         {
             get { return _RegexLine; }
         }
-
         public MatchResult(string strName, string strDataString, int nRegexLine)
         {
             this._Name = strName;
@@ -491,7 +457,6 @@ namespace OnlyExe_STPortScanner
             this._RegexLine = nRegexLine;
         }
     }
-
     public enum ProbeType
     {
         Tcp,

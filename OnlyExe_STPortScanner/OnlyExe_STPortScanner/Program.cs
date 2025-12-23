@@ -7,7 +7,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-
 namespace OnlyExe_STPortScanner
 {
     public class Program
@@ -28,7 +27,6 @@ namespace OnlyExe_STPortScanner
         static Queue<ulong> m_que_task = new Queue<ulong>();
         static HashSet<uint> m_hs_stop_host = new HashSet<uint>();
         static object m_obj_sync = new object();
-
         static void Main(string[] args)
         {
             m_clr = Console.ForegroundColor;
@@ -47,16 +45,6 @@ namespace OnlyExe_STPortScanner
                     Config.ConfigProbes,
                     Config.ConfigDefPorts
                 );
-            // if (!File.Exists("./config_defports.st")) ConfigerHelper.CreateConfigFile("./config_defports.st", false);
-            // if (!File.Exists("./config_probes.st")) ConfigerHelper.CreateConfigFile("./config_probes.st", true);
-            // m_pc = new ProbeConfiger(
-            //    File.ReadAllText("./config_probes.st"),
-            //    File.ReadAllText("./config_defports.st")
-            //    );
-            // m_pc = new ProbeConfiger(
-            //     "", // write your probes config file path here
-            //     "" // write your default ports config file path here
-            // );
             try
             {
                 m_scanner = ScannerStatic.InitScanner(args, m_pc);
@@ -118,7 +106,6 @@ namespace OnlyExe_STPortScanner
             Console.ForegroundColor = m_clr;
             //Console.ReadKey();
         }
-
         static void ShowPregress()
         {
             while (true)
@@ -135,7 +122,6 @@ namespace OnlyExe_STPortScanner
                 }
             }
         }
-
         static void IcmpFlushCallBack()
         {
             ulong lep = 0;
@@ -163,7 +149,6 @@ namespace OnlyExe_STPortScanner
                 Program.Scan((uint)(lep >> 32), (int)lep);
             }
         }
-
         static void EnCache(uint uIP, int nPort, bool isAsync)
         {
             ulong lep = (ulong)uIP << 32;
@@ -176,7 +161,6 @@ namespace OnlyExe_STPortScanner
                 if (m_nCacheCounter == m_nCacheCount) Program.FlushCache(isAsync);
             }
         }
-
         static void FlushCache(bool isAsync)
         {
             int nIndex = 0, nLen = 0;
@@ -203,7 +187,6 @@ namespace OnlyExe_STPortScanner
                 m_que_task.Enqueue(m_arr_cache[i]);
             }
         }
-
         static void ScanFromRnd()
         {
             foreach (var r in ScannerConfiger.IPRange)
@@ -218,7 +201,6 @@ namespace OnlyExe_STPortScanner
             }
             Program.FlushCache(false);
         }
-
         static void ScanFromHost()
         {
             foreach (var r in ScannerConfiger.IPRange)
@@ -233,7 +215,6 @@ namespace OnlyExe_STPortScanner
                 }
             }
         }
-
         static void ScanFromPort()
         {
             foreach (var p in ScannerConfiger.PortList)
@@ -248,7 +229,6 @@ namespace OnlyExe_STPortScanner
                 }
             }
         }
-
         static void Scan(uint uIP, int nPort)
         {
             m_se.WaitOne();
@@ -271,7 +251,6 @@ namespace OnlyExe_STPortScanner
                 ScannerConfiger.TotalTimeout,
                 ScannerConfiger.IsUserNullProbe);
         }
-
         static void icmp_Completed(object sender, IcmpEventArgs e)
         {
             if (e.CanAccess)
@@ -294,7 +273,6 @@ namespace OnlyExe_STPortScanner
                 m_nRunning--;
             }
         }
-
         static void m_scanner_Completed(object sender, ScanEventArgs e)
         {
             if (e.CanConnect)
@@ -326,7 +304,6 @@ namespace OnlyExe_STPortScanner
                 m_nRunning--;
             }
         }
-
         static void OutResult(string strIP, string strPort, string strProtoType, string strProtoFlag, string strBanner, int nLine, byte[] byBuffer, int nLen)
         {
             if (ScannerConfiger.ConsoleDisplay > 0)

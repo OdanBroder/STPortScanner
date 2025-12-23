@@ -7,7 +7,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-
 namespace  OnlyExe_STPortScanner
 {
     public class IcmpScanner : IDisposable
@@ -19,11 +18,8 @@ namespace  OnlyExe_STPortScanner
         private object m_obj_sync = new object();
         private Queue<SocketAsyncEventArgs> m_que_sae;
         private Dictionary<uint, TaskInfo> m_dic_task_running;
-
         private Stopwatch m_sw = new Stopwatch();
-
         private bool _IsDisposed;
-
         private byte[] by_icmp = new byte[] {
             0x08,
             0x00,
@@ -31,7 +27,6 @@ namespace  OnlyExe_STPortScanner
             0x00, 0x00,
             0x00, 0x00
         };
-
         private class TaskInfo
         {
             public uint ID;
@@ -46,14 +41,11 @@ namespace  OnlyExe_STPortScanner
             public long StartTime;
             public long LastTime;
         }
-
         public event IcmpEventHandler Completed;
-
         protected virtual void OnCompleted(IcmpEventArgs e)
         {
             if (this.Completed != null) this.Completed(this, e);
         }
-
         public IcmpScanner(int nMaxTask)
         {
             if (nMaxTask > 60000) throw new ArgumentException("The [nMaxTask] must less than 60000");
@@ -62,7 +54,6 @@ namespace  OnlyExe_STPortScanner
             m_se = new Semaphore(nMaxTask, nMaxTask);
             m_que_sae = new Queue<SocketAsyncEventArgs>();
             m_dic_task_running = new Dictionary<uint, TaskInfo>();
-
             for (int i = 0; i < nMaxTask; i++)
             {
                 TaskInfo ti = new TaskInfo();
@@ -86,7 +77,6 @@ namespace  OnlyExe_STPortScanner
             if (!m_sock.ReceiveFromAsync(sae)) IOProcessPool.QueueWork(this.ProcessRecv, sae);
             new Thread(this.CheckTimeout) { IsBackground = true }.Start();
         }
-
         private SocketAsyncEventArgs PopSAE()
         {
             lock (m_obj_sync)
@@ -98,7 +88,6 @@ namespace  OnlyExe_STPortScanner
             sae.SetBuffer(new byte[9], 0, 9);
             return sae;
         }
-
         private void PushSAE(SocketAsyncEventArgs sae)
         {
             lock (m_obj_sync)
@@ -107,17 +96,14 @@ namespace  OnlyExe_STPortScanner
                 m_que_sae.Enqueue(sae);
             }
         }
-
         public uint Ping(IPAddress ipAddr, int nTimeout)
         {
             return this.Ping(ipAddr, nTimeout, 3, null);
         }
-
         public uint Ping(IPAddress ipAddr, int nTimeout, int nRetry)
         {
             return this.Ping(ipAddr, nTimeout, nRetry, null);
         }
-
         public uint Ping(IPAddress ipAddr, int nTimeout, int nRetry, byte[] byData)
         {
             lock (m_obj_sync)
@@ -134,7 +120,6 @@ namespace  OnlyExe_STPortScanner
             this.SendData(ti);
             return ti.ID;
         }
-
         private TaskInfo CreateTaskInfo(IPAddress ipAddr, int nRetry, byte[] byData)
         {
             TaskInfo ti = null;
@@ -166,7 +151,6 @@ namespace  OnlyExe_STPortScanner
             ti.RunedRetry = 0;
             return ti;
         }
-
         private void SendData(TaskInfo ti)
         {
             SocketAsyncEventArgs sae = this.PopSAE();
@@ -181,14 +165,12 @@ namespace  OnlyExe_STPortScanner
             ti.IsStarted = true;
             if (!m_sock.SendToAsync(sae)) IOProcessPool.QueueWork(this.ProcessSend, sae);
         }
-
         private void FullCheckSum(byte[] byPacket)
         {
             uint sum = RAWDefine.CheckSum(byPacket, byPacket.Length);
             byPacket[2] = (byte)sum;
             byPacket[3] = (byte)(sum >> 8);
         }
-
         private void IO_Completed(object sender, SocketAsyncEventArgs e)
         {
             switch (e.LastOperation)
@@ -201,12 +183,10 @@ namespace  OnlyExe_STPortScanner
                     break;
             }
         }
-
         private void ProcessSend(SocketAsyncEventArgs e)
         {
             this.PushSAE(e);
         }
-
         private void ProcessRecv(SocketAsyncEventArgs e)
         {
             Socket sock = e.UserToken as Socket;
@@ -245,7 +225,6 @@ namespace  OnlyExe_STPortScanner
             }
             if (!sock.ReceiveFromAsync(e)) IOProcessPool.QueueWork(this.ProcessRecv, e);
         }
-
         private void EndTask(TaskInfo ti, IcmpEventArgs e)
         {
             ti.IsStarted = false;
@@ -256,7 +235,6 @@ namespace  OnlyExe_STPortScanner
             }
             m_se.Release();
         }
-
         private void CheckTimeout()
         {
             long nTimes = 0;
@@ -292,7 +270,6 @@ namespace  OnlyExe_STPortScanner
                 if (bDisposed) break;
             }
         }
-
         public void Dispose()
         {
             lock (m_obj_sync)

@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
 using System.Net;
 using System.Net.Sockets;
-
 namespace OnlyExe_STPortScanner
 {
     public delegate void IcmpEventHandler(object sender, IcmpEventArgs e);
     public delegate void ScanEventHandler(object sender, ScanEventArgs e);
-
     internal class ScanTaskInfo
     {
         public uint TaskID;
@@ -24,7 +21,6 @@ namespace OnlyExe_STPortScanner
         public int Timeout;
         public int TotalTimeout;
     }
-
     internal class TCPScanTaskInfo : ScanTaskInfo
     {
         public Socket Socket;
@@ -33,7 +29,6 @@ namespace OnlyExe_STPortScanner
         public Queue<ProbeInfo> SendProbes;
         public SocketAsyncEventArgs RecvSAE;
     }
-
     internal class SYNScanTaskInfo : ScanTaskInfo
     {
         public byte[] SYNPacket;
@@ -42,7 +37,6 @@ namespace OnlyExe_STPortScanner
         public uint SEQ;
         public uint UIP;
     }
-
     internal class UDPScanTaskInfo : ScanTaskInfo
     {
         //public ProbeInfo CurrentProbe;
@@ -50,7 +44,6 @@ namespace OnlyExe_STPortScanner
         public Queue<byte[]> SendDatasQueue;
         //public Queue<ProbeInfo> SendProbes;
     }
-
     internal class SmbScanTaskInfo : ScanTaskInfo
     {
         public int Step;

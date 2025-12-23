@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using System.IO;
-
 namespace OnlyExe_STPortScanner
 {
     public class ScannerConfiger
@@ -29,7 +27,6 @@ namespace OnlyExe_STPortScanner
         public static Dictionary<string, HashSet<string>> DomainDic = new Dictionary<string, HashSet<string>>();
         public static HashSet<string> StopProto = new HashSet<string>();
         public static List<Range> IPRange = new List<Range>();
-
         public static int[] PortList = new int[]{
             80, 443, 8080, 161, 7547, 5060, 22, 1720, 53, 21,
             123, 3389, 110, 995, 25, 8000, 8081, 23, 554, 3306,

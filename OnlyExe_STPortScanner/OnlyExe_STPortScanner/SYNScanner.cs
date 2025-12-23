@@ -6,7 +6,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-
 namespace OnlyExe_STPortScanner
 {
     public class SYNScanner : PortScanner
@@ -26,9 +25,7 @@ namespace OnlyExe_STPortScanner
         private uint m_uLocalIP;
         private string m_strLocalIP;
         private ushort m_nLocalPort;
-
         public SYNScanner(int nMaxTask, ProbeConfiger probes) : this(nMaxTask, probes, null) { }
-
         public SYNScanner(int nMaxTask, ProbeConfiger probes, EndPoint bindEndPoint)
         {
             if (nMaxTask > 60000 || nMaxTask < 1) throw new ArgumentOutOfRangeException("the MaxTask must be between 1 and 30000");
@@ -53,14 +50,12 @@ namespace OnlyExe_STPortScanner
             m_uLocalIP = RAWDefine.IPToINT(m_strLocalIP);
             m_nLocalPort = ushort.Parse(bindEndPoint.ToString().Split(':')[1]);
             m_se = new Semaphore(nMaxTask, nMaxTask);
-
             //m_sock_raw = new Socket(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.IP);
             //m_sock_raw.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.HeaderIncluded, true);
             //m_sock_raw.Bind(bindEndPoint);
             //m_sock_raw.IOControl(IOControlCode.ReceiveAll, new byte[] { 1, 0, 0, 0 }, null);
             RawSocket.InitRawSocket(bindEndPoint);
             RawSocket.RecvCompleted += this.ProcessRecv;
-
             m_que_task = new Queue<SYNScanTaskInfo>();
             m_que_sae = new Queue<SocketAsyncEventArgs>();
             for (int i = 0; i < nMaxTask; i++)
@@ -70,7 +65,6 @@ namespace OnlyExe_STPortScanner
                 ti.SYNPacket = new byte[40];
                 m_que_task.Enqueue(ti);
             }
-
             //SocketAsyncEventArgs sae = new SocketAsyncEventArgs();
             //sae.Completed += new EventHandler<SocketAsyncEventArgs>(IO_Completed);
             //sae.SetBuffer(new byte[65535], 0, 65535);
@@ -80,7 +74,6 @@ namespace OnlyExe_STPortScanner
             m_thread_timeout.IsBackground = true;
             m_thread_timeout.Start();
         }
-
         void m_tcp_Completed(object sender, ScanEventArgs e)
         {
             uint uid = e.TaskID;
@@ -100,7 +93,6 @@ namespace OnlyExe_STPortScanner
             base.OnCompleted(e);
             m_se.Release();
         }
-
         //private SocketAsyncEventArgs PopSAE() {
         //    lock (m_obj_sync) {
         //        if (m_que_sae.Count != 0) return m_que_sae.Dequeue();
@@ -110,14 +102,12 @@ namespace OnlyExe_STPortScanner
         //    sae.SetBuffer(new byte[40], 0, 40);
         //    return sae;
         //}
-
         //private void PushSAE(SocketAsyncEventArgs sae) {
         //    lock (m_obj_sync) {
         //        if (base._IsDisposed) return;
         //        m_que_sae.Enqueue(sae);
         //    }
         //}
-
         protected override uint OnScan(int nPort, EndPoint endPoint, int nProbes, int nTimeout, int nRetry, int nTotalTimeout, bool bUseNullProbe)
         {
             lock (m_obj_sync)
@@ -136,7 +126,6 @@ namespace OnlyExe_STPortScanner
             ti.IsStarted = true;
             return ti.TaskID;
         }
-
         //private void SendData(SYNScanTaskInfo ti) {
         //    SocketAsyncEventArgs sae = this.PopSAE();
         //    Array.Copy(ti.SYNPacket, sae.Buffer, ti.SYNPacket.Length);
@@ -144,7 +133,6 @@ namespace OnlyExe_STPortScanner
         //    sae.RemoteEndPoint = ti.EndPoint;
         //    if (!m_sock_raw.SendToAsync(sae)) IOProcessPool.QueueWork(this.ProcessSend, sae);
         //}
-
         private SYNScanTaskInfo CreateTaskInfo(int nPort, EndPoint endPoint, int nProbes, int nTimeout, int nRetry, int nTotalTimeout, bool bUseNullProbes)
         {
             SYNScanTaskInfo ti = null;
@@ -169,7 +157,6 @@ namespace OnlyExe_STPortScanner
             ti.SEQ = RAWDefine.GetSynPacket(ti.SYNPacket, m_uLocalIP, ti.UIP, m_nLocalPort, (ushort)ti.Port, ti.TaskID);
             return ti;
         }
-
         //void IO_Completed(object sender, SocketAsyncEventArgs e) {
         //    switch (e.LastOperation) {
         //        case SocketAsyncOperation.SendTo:
@@ -180,11 +167,9 @@ namespace OnlyExe_STPortScanner
         //            break;
         //    }
         //}
-
         //private void ProcessSend(SocketAsyncEventArgs e) {
         //    this.PushSAE(e);
         //}
-
         private void ProcessRecv(object sender, SocketAsyncEventArgs e)
         {
             lock (m_obj_sync)
@@ -224,7 +209,6 @@ namespace OnlyExe_STPortScanner
             }
             //if (!sock.ReceiveAsync(e)) IOProcessPool.QueueWork(this.ProcessRecv, e);
         }
-
         private void EndTask(SYNScanTaskInfo ti)
         {
             ti.IsStarted = false;
@@ -241,7 +225,6 @@ namespace OnlyExe_STPortScanner
             base.OnCompleted(new ScanEventArgs(ti.TaskID, ti.EndPoint, "ACK timeout"));
             m_se.Release();
         }
-
         private void CheckTimeout()
         {
             DateTime dt = DateTime.Now;
@@ -280,7 +263,6 @@ namespace OnlyExe_STPortScanner
                 if (bDisposed) break;
             }
         }
-
         public override void Dispose()
         {
             lock (m_obj_sync)

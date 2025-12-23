@@ -1,49 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
 using System.Net;
-
 namespace OnlyExe_STPortScanner
 {
     public class ScanEventArgs : EventArgs
     {
         private uint _TaskID;
-
         public uint TaskID
         {
             get { return _TaskID; }
             internal set { _TaskID = value; }
         }
-
         private bool _CanConnect;
-
         public bool CanConnect
         {
             get { return _CanConnect; }
         }
-
         private EndPoint _EndPoint;
-
         public EndPoint EndPoint
         {
             get { return _EndPoint; }
         }
-
         private string _Protocol;
-
         public string Protocol
         {
             get { return _Protocol; }
         }
-
         private int _RegexLine;
-
         public int RegexLine
         {
             get { return _RegexLine; }
         }
-
         private string _Banner;
         /// <summary>
         /// banner信息
@@ -52,21 +40,16 @@ namespace OnlyExe_STPortScanner
         {
             get { return _Banner; }
         }
-
         private byte[] _Data;
-
         public byte[] Data
         {
             get { return _Data; }
         }
-
         private int _Length;
-
         public int Length
         {
             get { return _Length; }
         }
-
         private string _ErrorMessage;
         /// <summary>
         /// 连接过程中最后一次错误信息
@@ -75,7 +58,6 @@ namespace OnlyExe_STPortScanner
         {
             get { return _ErrorMessage; }
         }
-
         public ScanEventArgs(uint uid, EndPoint endPoint, string strError)
         {
             this._TaskID = uid;
@@ -83,7 +65,6 @@ namespace OnlyExe_STPortScanner
             this._ErrorMessage = strError;
             this._CanConnect = false;
         }
-
         public ScanEventArgs(uint uid, EndPoint endPoint, bool bCanConnect, string strError)
         {
             this._TaskID = uid;
@@ -91,7 +72,6 @@ namespace OnlyExe_STPortScanner
             this._ErrorMessage = strError;
             this._EndPoint = endPoint;
         }
-
         public ScanEventArgs(uint uid, EndPoint endPoint, string strPro, int nRegexLine, string strBanner, byte[] byData, int nLen)
         {
             this._TaskID = uid;

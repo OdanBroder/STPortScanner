@@ -2,17 +2,14 @@
 using System.Threading;
 using System.Net.Sockets;
 using System.Collections.Generic;
-
 namespace OnlyExe_STPortScanner
 {
     internal delegate void IOProcessHandler(SocketAsyncEventArgs e);
-
     internal static class IOProcessPool
     {
         private static ManualResetEvent m_mre;
         private static Stack<IOHandlerInfo> m_stack_idle;
         private static Queue<IOHandlerInfo> m_queue_work;
-
         static IOProcessPool()
         {
             IOHandlerInfo hi = null;
@@ -39,7 +36,6 @@ namespace OnlyExe_STPortScanner
             })
             { IsBackground = true }.Start();
         }
-
         private static IOHandlerInfo PopHandler(IOProcessHandler handler, SocketAsyncEventArgs args)
         {
             IOHandlerInfo hi = null;
@@ -58,12 +54,10 @@ namespace OnlyExe_STPortScanner
             }
             return hi;
         }
-
         private static void PushHandler(IOHandlerInfo hi)
         {
             lock (m_stack_idle) m_stack_idle.Push(hi);
         }
-
         public static void QueueWork(IOProcessHandler handler, SocketAsyncEventArgs args)
         {
             lock (m_queue_work)
@@ -73,25 +67,20 @@ namespace OnlyExe_STPortScanner
             m_mre.Set();
             if (m_queue_work.Count > 1000) Console.WriteLine("======================: " + m_queue_work.Count);
         }
-
         private class IOHandlerInfo
         {
             private IOProcessHandler _Handler;
-
             public IOProcessHandler Handler
             {
                 get { return _Handler; }
                 set { _Handler = value; }
             }
-
             private SocketAsyncEventArgs _Args;
-
             public SocketAsyncEventArgs Args
             {
                 get { return _Args; }
                 set { _Args = value; }
             }
-
             public IOHandlerInfo(IOProcessHandler handler, SocketAsyncEventArgs args)
             {
                 this._Handler = handler;

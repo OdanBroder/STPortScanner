@@ -6,19 +6,14 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-
 namespace OnlyExe_STPortScanner
 {
     public class SmbScanner : PortScanner
     {
         #region smb_packet
-
         private static int[] m_byNext;
-
         private static byte[] m_byNTLMSSP;
-
         private static byte[] m_bySmbHeader = new byte[] { 0xFF, 0x53, 0x4D, 0x42 };
-
         private static byte[] m_bySmb1 = new byte[]{
             0x00,0x00,0x00,0x85,0xff,0x53,0x4d,0x42,0x72,0x00
             ,0x00,0x00,0x00,0x18,0x53,0xc8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
@@ -30,7 +25,6 @@ namespace OnlyExe_STPortScanner
             ,0x31,0x2e,0x32,0x58,0x30,0x30,0x32,0x00,0x02,0x4c,0x41,0x4e,0x4d,0x41,0x4e,0x32
             ,0x2e,0x31,0x00,0x02,0x4e,0x54,0x20,0x4c,0x4d,0x20,0x30,0x2e,0x31,0x32,0x00
         };
-
         private static byte[] m_bySmb2 = new byte[]{
             0x00,0x00,0x01,0x0a,0xff,0x53,0x4d,0x42,0x73,0x00,0x00,0x00,0x00,0x18,0x07,0xc8
             ,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0xfe
@@ -50,24 +44,18 @@ namespace OnlyExe_STPortScanner
             ,0x72,0x00,0x76,0x00,0x65,0x00,0x72,0x00,0x20,0x00,0x32,0x00,0x30,0x00,0x30,0x00
             ,0x33,0x00,0x20,0x00,0x35,0x00,0x2e,0x00,0x32,0x00,0x00,0x00,0x00,0x00
         };
-
         #endregion
-
         private Semaphore m_se;
         private Queue<SmbScanTaskInfo> m_que_task;
         private Queue<SocketAsyncEventArgs> m_que_sae;
         private HashSet<SmbScanTaskInfo> m_hs_task_running;
         private StringBuilder m_strBuffer = new StringBuilder();
         //private object m_obj_sync = new object();
-
         private static Dictionary<int, string> m_dic_netbios = new Dictionary<int, string>();
-
         //private bool _IsDisposed = false;
-
         //public bool IsDisposed {
         //    get { return _IsDisposed; }
         //}
-
         public SmbScanner(int nMaxTask)
         {
             m_dic_netbios.Add(1, "NetBIOS computer name ");
@@ -94,7 +82,6 @@ namespace OnlyExe_STPortScanner
             m_byNext = SmbScanner.GetNextVal(m_byNTLMSSP);
             new Thread(this.CheckTimeout) { IsBackground = true }.Start();
         }
-
         protected override uint OnScan(int nPort, EndPoint endPoint, int nProbes, int nTimeout, int nRetry, int nTotalTimeout, bool bUseNullProbes)
         {
             lock (m_obj_sync)
@@ -107,7 +94,6 @@ namespace OnlyExe_STPortScanner
             this.StartConnect(ti);
             return ti.TaskID;
         }
-
         private SmbScanTaskInfo CreateTaskInfo(int nPort, EndPoint endPoint, int nProbes, int nTimeout, int nRetry, int nTotalTimeout, bool bUseNullProbe)
         {
             SmbScanTaskInfo ti = null;
@@ -127,7 +113,6 @@ namespace OnlyExe_STPortScanner
             ti.Step = 1;
             return ti;
         }
-
         private void StartConnect(SmbScanTaskInfo ti)
         {
             if (ti.Socket != null) base.CloseSocket(ti.Socket);
@@ -149,7 +134,6 @@ namespace OnlyExe_STPortScanner
                 this.EndTask(ti, new ScanEventArgs(ti.TaskID, ti.EndPoint, ti.CanConnect, "[SOCKET]-" + ex.Message));
             }
         }
-
         private void IO_Completed(object sender, SocketAsyncEventArgs e)
         {
             switch (e.LastOperation)
@@ -165,7 +149,6 @@ namespace OnlyExe_STPortScanner
                     break;
             }
         }
-
         private void ProcessConnect(SocketAsyncEventArgs e)
         {
             SmbScanTaskInfo ti = e.UserToken as SmbScanTaskInfo;
@@ -203,12 +186,10 @@ namespace OnlyExe_STPortScanner
                 this.PushSAE(e);
             }
         }
-
         private void ProcessSend(SocketAsyncEventArgs e)
         {
             this.PushSAE(e);
         }
-
         private void ProcessRecv(SocketAsyncEventArgs e)
         {
             SmbScanTaskInfo ti = e.UserToken as SmbScanTaskInfo;
@@ -296,7 +277,6 @@ namespace OnlyExe_STPortScanner
                 this.EndTask(ti, new ScanEventArgs(ti.TaskID, ti.EndPoint, "SMB", -1, strResult, e.Buffer, e.BytesTransferred));
             }
         }
-
         private void EndTask(SmbScanTaskInfo ti, ScanEventArgs e)
         {
             this.CloseSocket(ti.Socket);
@@ -310,14 +290,12 @@ namespace OnlyExe_STPortScanner
             base.OnCompleted(e);
             m_se.Release();
         }
-
         private Socket GetNextSocket(int nTimeout)
         {
             Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             sock.SendTimeout = sock.ReceiveTimeout = nTimeout;
             return sock;
         }
-
         private SocketAsyncEventArgs PopSAE()
         {
             lock (m_obj_sync)
@@ -329,7 +307,6 @@ namespace OnlyExe_STPortScanner
             sae.SetBuffer(new byte[2048], 0, 2048);
             return sae;
         }
-
         private void PushSAE(SocketAsyncEventArgs sae)
         {
             lock (m_obj_sync)
@@ -338,7 +315,6 @@ namespace OnlyExe_STPortScanner
                 m_que_sae.Enqueue(sae);
             }
         }
-
         public override void Dispose()
         {
             lock (m_obj_sync)
@@ -347,7 +323,6 @@ namespace OnlyExe_STPortScanner
                 base._IsDisposed = true;
             }
         }
-
         private void CheckTimeout()
         {
             DateTime dt = DateTime.Now;
@@ -375,7 +350,6 @@ namespace OnlyExe_STPortScanner
                 if (bDisposed) break;
             }
         }
-
         private static bool CheckHeader(byte[] byBuffer)
         {
             if (byBuffer[0] != 0) return false;
@@ -385,12 +359,10 @@ namespace OnlyExe_STPortScanner
             }
             return true;
         }
-
         private static int KmpIndexOf(int nIndex, byte[] byParent, byte[] bySub, int[] nextVal)
         {
             int i = nIndex, j = -1;
             if (nextVal == null) nextVal = SmbScanner.GetNextVal(bySub);
-
             while (i < byParent.Length && j < bySub.Length)
             {
                 if (j == -1 || byParent[i] == bySub[j])
@@ -405,14 +377,11 @@ namespace OnlyExe_STPortScanner
             }
             return j >= bySub.Length ? i - bySub.Length : -1;
         }
-
         private static int[] GetNextVal(byte[] bySub)
         {
             int j = 0, k = -1;
             int[] nextVal = new int[bySub.Length];
-
             nextVal[0] = -1;
-
             while (j < bySub.Length - 1)
             {
                 if (k == -1 || bySub[j] == bySub[k])

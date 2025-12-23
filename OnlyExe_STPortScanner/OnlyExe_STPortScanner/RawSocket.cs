@@ -2,35 +2,27 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using System.Net;
 using System.Net.Sockets;
-
 namespace OnlyExe_STPortScanner
 {
     public class RawSocket
     {
         private static Socket m_sock_raw;
         private static Queue<SocketAsyncEventArgs> m_que_sae;
-
         public static event EventHandler<SocketAsyncEventArgs> RecvCompleted;
-
         private static object m_obj_sync = new object();
-
         private static bool _IsDisposed;
-
         public static bool IsDisposed
         {
             get { return _IsDisposed; }
         }
-
         public static void InitRawSocket(EndPoint bindEndPoint)
         {
             lock (m_obj_sync)
             {
                 if (m_sock_raw != null) return;
                 m_que_sae = new Queue<SocketAsyncEventArgs>();
-
                 if (bindEndPoint == null)
                 {
                     foreach (var v in Dns.GetHostAddresses(Dns.GetHostName()))
@@ -43,7 +35,6 @@ namespace OnlyExe_STPortScanner
                 m_sock_raw.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.HeaderIncluded, true);
                 m_sock_raw.Bind(bindEndPoint);
                 m_sock_raw.IOControl(IOControlCode.ReceiveAll, new byte[] { 1, 0, 0, 0 }, null);
-
                 SocketAsyncEventArgs sae = new SocketAsyncEventArgs();
                 sae.Completed += new EventHandler<SocketAsyncEventArgs>(IO_Completed);
                 sae.SetBuffer(new byte[65535], 0, 65535);
@@ -52,12 +43,10 @@ namespace OnlyExe_STPortScanner
                 if (!m_sock_raw.ReceiveFromAsync(sae)) IOProcessPool.QueueWork(RawSocket.ProcessRecv, sae);
             }
         }
-
         private static void OnRecvCompleted(SocketAsyncEventArgs e)
         {
             if (RawSocket.RecvCompleted != null) RawSocket.RecvCompleted(null, e);
         }
-
         public static void SendData(byte[] byData, int nIndex, int nLen)
         {
             SocketAsyncEventArgs sae = RawSocket.PopSAE();
@@ -69,7 +58,6 @@ namespace OnlyExe_STPortScanner
             //sae.remo
             if (!m_sock_raw.SendToAsync(sae)) IOProcessPool.QueueWork(RawSocket.ProcessRecv, sae);
         }
-
         private static void IO_Completed(object sender, SocketAsyncEventArgs e)
         {
             switch (e.LastOperation)
@@ -82,12 +70,10 @@ namespace OnlyExe_STPortScanner
                     break;
             }
         }
-
         private static void ProcessSend(SocketAsyncEventArgs e)
         {
             RawSocket.PushSAE(e);
         }
-
         private static void ProcessRecv(SocketAsyncEventArgs e)
         {
             Socket sock = e.UserToken as Socket;
@@ -101,7 +87,6 @@ namespace OnlyExe_STPortScanner
             }
             catch { }
         }
-
         private static SocketAsyncEventArgs PopSAE()
         {
             lock (m_obj_sync)
@@ -114,7 +99,6 @@ namespace OnlyExe_STPortScanner
             sae.RemoteEndPoint = new IPEndPoint(IPAddress.Parse("1.1.1.1"), 0);
             return sae;
         }
-
         private static void PushSAE(SocketAsyncEventArgs sae)
         {
             lock (m_obj_sync)
@@ -122,7 +106,6 @@ namespace OnlyExe_STPortScanner
                 m_que_sae.Enqueue(sae);
             }
         }
-
         public static void Dispose()
         {
             lock (m_obj_sync)

@@ -1,0 +1,7 @@
+C:\Users\dduca\Documents\code\OnlyExe_STPortScanner\OnlyExe_STPortScanner\bin\Debug\OnlyExe_STPortScanner.exe.config
+C:\Users\dduca\Documents\code\OnlyExe_STPortScanner\OnlyExe_STPortScanner\bin\Debug\OnlyExe_STPortScanner.exe
+C:\Users\dduca\Documents\code\OnlyExe_STPortScanner\OnlyExe_STPortScanner\bin\Debug\OnlyExe_STPortScanner.pdb
+C:\Users\dduca\Documents\code\OnlyExe_STPortScanner\OnlyExe_STPortScanner\obj\Debug\OnlyExe_STPortScanner.csproj.AssemblyReference.cache
+C:\Users\dduca\Documents\code\OnlyExe_STPortScanner\OnlyExe_STPortScanner\obj\Debug\OnlyExe_STPortScanner.csproj.CoreCompileInputs.cache
+C:\Users\dduca\Documents\code\OnlyExe_STPortScanner\OnlyExe_STPortScanner\obj\Debug\OnlyExe_STPortScanner.exe
+C:\Users\dduca\Documents\code\OnlyExe_STPortScanner\OnlyExe_STPortScanner\obj\Debug\OnlyExe_STPortScanner.pdb

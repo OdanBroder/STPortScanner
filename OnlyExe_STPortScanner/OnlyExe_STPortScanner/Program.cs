@@ -69,7 +69,7 @@ namespace OnlyExe_STPortScanner
             }
             DateTime dt = DateTime.Now;
             m_se = new Semaphore(ScannerConfiger.Concurrent, ScannerConfiger.Concurrent);
-            new Thread(Program.ShowPregress) { IsBackground = true }.Start();
+            // new Thread(Program.ShowPregress) { IsBackground = true }.Start();
             if (ScannerConfiger.IsIcmp)
             {
                 IcmpScanner icmp = new IcmpScanner(ScannerConfiger.Concurrent);
@@ -105,7 +105,7 @@ namespace OnlyExe_STPortScanner
                 }
             }
             while (m_nTaskCount != m_nRuned) Thread.Sleep(500);
-            Console.WriteLine("Queue:" + (m_nTaskCount - m_nRuned) + "  Running:" + m_nRunning + "  Runed:" + m_nRuned + "  Result:" + m_nResult + "  Jumped:" + m_nJumped);
+            // Console.WriteLine("Queue:" + (m_nTaskCount - m_nRuned) + "  Running:" + m_nRunning + "  Runed:" + m_nRuned + "  Result:" + m_nResult + "  Jumped:" + m_nJumped);
             string strTimeSub = DateTime.Now.Subtract(dt).ToString();
             strTimeSub = strTimeSub.Substring(0, strTimeSub.LastIndexOf(':') + 3);
             Console.ForegroundColor = ConsoleColor.Green;

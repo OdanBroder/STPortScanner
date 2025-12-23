@@ -1,38 +1,49 @@
-# STPortScanner (Standalone EXE Fork)
+## Cobalt Strike (`execute-assembly`) Version
 
-This repository is a fork of **[STPortScanner](https://github.com/DebugST/STPortScanner)** by DebugST.
+This version is modified to run correctly when executed via **Cobalt Strike’s `execute-assembly`** feature.
 
-## 🔧 What’s Different?
+### Background
 
-In the original STPortScanner project, the executable **depends on an external DLL** to run correctly.
+The original implementation loads configuration files directly from disk:
 
-This fork removes that dependency and provides a **fully standalone `.exe`**, with **no additional DLL required**.
+```csharp
+if (!File.Exists("./config_defports.st"))
+    ConfigerHelper.CreateConfigFile("./config_defports.st", false);
 
-### Key Improvements
+if (!File.Exists("./config_probes.st"))
+    ConfigerHelper.CreateConfigFile("./config_probes.st", true);
 
-* **No external DLL dependency**
-* **Single standalone executable**
-* Easier deployment and execution
-* Suitable for:
+m_pc = new ProbeConfiger(
+    File.ReadAllText("./config_probes.st"),
+    File.ReadAllText("./config_defports.st")
+);
+```
 
-  * Portable usage
-  * Lab environments
-  * Red team tooling
-  * Systems where dropping extra files is undesirable
+This approach does **not work reliably** with `execute-assembly`, since the assembly is executed **in-memory** and may not have access to the filesystem.
 
-## Why This Fork?
+### Modification
 
-This version is useful when you want:
+To ensure compatibility with `execute-assembly`, configuration data is **embedded or initialized in code** instead of being read from disk.
 
-* A **one-file executable**
-* No missing-DLL errors
-* Simpler execution without setup or environment preparation
+The file-loading logic is removed and replaced with in-memory values (or empty strings):
 
-## Credits
+```csharp
+m_pc = new ProbeConfiger(
+    "", // probes configuration (in-memory)
+    ""  // default ports configuration (in-memory)
+);
+```
 
-All original credit goes to **DebugST** for the base project:
-[https://github.com/DebugST/STPortScanner](https://github.com/DebugST/STPortScanner)
+### Result
 
-This fork only changes the build/output format and does not claim ownership of the original work.
+* No filesystem access required
+* Compatible with in-memory execution
+* Prevents file creation or read errors
+* Works correctly with Cobalt Strike `execute-assembly`
 
+### Notes
 
+If custom probe or port configurations are needed, they should be:
+
+* Embedded directly in the source code, or
+* Passed as parameters before initializing `ProbeConfiger`

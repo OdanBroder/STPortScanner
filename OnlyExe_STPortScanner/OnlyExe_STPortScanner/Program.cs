@@ -42,12 +42,16 @@ namespace OnlyExe_STPortScanner
                 ScannerStatic.ShowInfo();
                 return;
             }
-            if (!File.Exists("./config_defports.st")) ConfigerHelper.CreateConfigFile("./config_defports.st", false);
-            if (!File.Exists("./config_probes.st")) ConfigerHelper.CreateConfigFile("./config_probes.st", true);
+            //if (!File.Exists("./config_defports.st")) ConfigerHelper.CreateConfigFile("./config_defports.st", false);
+            //if (!File.Exists("./config_probes.st")) ConfigerHelper.CreateConfigFile("./config_probes.st", true);
+            //m_pc = new ProbeConfiger(
+            //    File.ReadAllText("./config_probes.st"),
+            //    File.ReadAllText("./config_defports.st")
+            //    );
             m_pc = new ProbeConfiger(
-                File.ReadAllText("./config_probes.st"),
-                File.ReadAllText("./config_defports.st")
-                );
+                "", // write your probes config file path here
+                "" // write your default ports config file path here
+            );
             try
             {
                 m_scanner = ScannerStatic.InitScanner(args, m_pc);

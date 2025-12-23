@@ -1,0 +1,99 @@
+beacon_command_register(
+    "stpscan",
+    "Run STPScan port scanner via execute-assembly",
+    "\n--------------------------------[ STPScan 4.0 ]--------------------------------\n\n" .
+    "Usage:\n" .
+    "   stpscan [options]\n\n" .
+
+    "Host Options:\n" .
+    "   -h     Host targets (single, list, range, CIDR)\n" .
+    "          -h target.com,192.168.0.1,192.168.0.2-192.168.1.254,192.168.0.0/24\n" .
+    "   -hf    Load hosts from file (newline separated)\n" .
+    "          -hf ./iplist.txt\n\n" .
+
+    "Port Options:\n" .
+    "   -p     Ports to scan (default: Top 300)\n" .
+    "          -p 21,22,80,443,8000-8080\n" .
+    "   -pf    Load ports from file (newline separated)\n" .
+    "          -pf ./portlist.txt\n\n" .
+
+    "Scan Behavior:\n" .
+    "   -np    Null probe mode\n" .
+    "   -pr    Probe count (default: 1)\n" .
+    "          -pr 3\n" .
+    "   -i     ICMP only (requires admin, Windows Server)\n" .
+    "   -is    ICMP + scan\n" .
+    "   -t     Timeout per probe (default: 5)\n" .
+    "          -t 3\n" .
+    "   -tt    Total timeout (default: 60)\n" .
+    "          -tt 30\n" .
+    "   -r     Retries (default: 3)\n" .
+    "          -r 5\n\n" .
+
+    "Scan Types:\n" .
+    "   -st    TCP scan (default)\n" .
+    "   -su    UDP scan\n" .
+    "   -ss    SYN scan (requires admin, Windows Server)\n" .
+    "   -smb   Only scan SMB (port 445)\n\n" .
+
+    "Performance:\n" .
+    "   -con   Concurrent scanner threads (default: 6000)\n" .
+    "          -con 20000\n" .
+    "   -stop  Stop scanning host when protocol found\n" .
+    "          -stop http,https\n" .
+    "   -order Scan priority (host | port | rnd)\n" .
+    "          -order rnd\n" .
+    "   -delay Progress display delay (default: 2)\n" .
+    "          -delay 5\n\n" .
+
+    "Output:\n" .
+    "   -cd    Console display level (0 | 1 | 2)\n" .
+    "          0  No display\n" .
+    "          1  IP:Port [Protocol]\n" .
+    "          2  IP:Port [Protocol][Regex][Banner]\n" .
+    "   -o     Output to file\n" .
+    "          -o ./result.txt\n" .
+    "   -f     Output format\n" .
+    "          -f (json|csv):(fields)\n\n" .
+
+    "Fields:\n" .
+    "   h   Host (127.0.0.1:8080)\n" .
+    "   a   Address (127.0.0.1)\n" .
+    "   p   Port (8080)\n" .
+    "   pt  Protocol type (TCP)\n" .
+    "   pf  Protocol flag (http)\n" .
+    "   pr  Protocol ((TCP)http)\n" .
+    "   l   Regex line\n" .
+    "   b   Banner\n" .
+    "   d   Hex recv data\n\n" .
+
+    "Other:\n" .
+    "   -cn    Convert Nmap probe config\n" .
+    "          -cn [nmap-service-probes] [config_nmap.st]\n\n" .
+
+    "Powered by Crystal_lz | ST233.COM\n"
+);
+
+alias stpscan {
+    if ($1 eq "") {
+        println("Usage: stpscan \"<arguments>\"");
+        return;
+    }
+
+    if ($2 eq "" || $3 ne "") {
+        println("Error: Arguments must be wrapped in double quotes.");
+        println("Example:");
+        println("  stpscan \"-h 10.0.0.0/24 -p 80,443\"");
+        return;
+    }
+
+    $stpscan = script_resource("OnlyExe_STPortScanner.exe");
+    if ($stpscan eq "") {
+        println("Error: OnlyExe_STPortScanner.exe not found.");
+        return;
+    }
+
+    bexecute_assembly($1, $stpscan, $2);
+}
+
+

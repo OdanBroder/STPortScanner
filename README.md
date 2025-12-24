@@ -1,38 +1,69 @@
+
 # STPortScanner (Standalone EXE Fork)
 
-This repository is a fork of **[STPortScanner](https://github.com/DebugST/STPortScanner)** by DebugST.
+This repository is a fork of **[STPortScanner](https://github.com/DebugST/STPortScanner)** by DebugST, modified to produce a **fully standalone executable**.
 
-## 🔧 What’s Different?
+---
 
-In the original STPortScanner project, the executable **depends on an external DLL** to run correctly.
+## Overview
 
-This fork removes that dependency and provides a **fully standalone `.exe`**, with **no additional DLL required**.
+The upstream STPortScanner executable **depends on an external DLL** at runtime.
+This fork removes that dependency and delivers a **single self-contained `.exe`**, simplifying deployment and execution.
 
-### Key Improvements
+---
 
-* **No external DLL dependency**
-* **Single standalone executable**
-* Easier deployment and execution
-* Suitable for:
+## What’s Different from Upstream
 
-  * Portable usage
-  * Lab environments
-  * Red team tooling
-  * Systems where dropping extra files is undesirable
+* Removed external DLL dependency
+* Built as a **single standalone executable**
+* No additional runtime files required (aside from configuration)
+* More reliable execution on systems with restricted environments
 
-## Why This Fork?
+---
 
-This version is useful when you want:
+## Use Cases
+
+This build is suitable for:
+
+* Portable or drop-and-run usage
+* Lab and test environments
+* Red team tooling
+* Scenarios where dropping extra binaries or DLLs is undesirable
+
+---
+
+## Why This Fork Exists
+
+Use this version if you need:
 
 * A **one-file executable**
-* No missing-DLL errors
-* Simpler execution without setup or environment preparation
+* No DLL-related runtime errors
+* Minimal setup and faster execution
+
+---
+
+## Requirements
+
+The following configuration files are still required at runtime:
+
+* `config/config_defports.st`
+* `config/config_probes.st`
+
+These files define supported ports, services, and probe matching logic.
+
+---
 
 ## Credits
 
 All original credit goes to **DebugST** for the base project:
 [https://github.com/DebugST/STPortScanner](https://github.com/DebugST/STPortScanner)
 
-This fork only changes the build/output format and does not claim ownership of the original work.
+This fork only modifies the build/output format and does not claim ownership of the original work.
 
+---
 
+If you want, I can also:
+
+* Add a **quick-start usage section**
+* Align this README with your **execute-assembly or CNA releases**
+* Write a **short GitHub release note** version

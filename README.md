@@ -60,10 +60,4 @@ All original credit goes to **DebugST** for the base project:
 
 This fork only modifies the build/output format and does not claim ownership of the original work.
 
----
 
-If you want, I can also:
-
-* Add a **quick-start usage section**
-* Align this README with your **execute-assembly or CNA releases**
-* Write a **short GitHub release note** version

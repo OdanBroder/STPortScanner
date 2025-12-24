@@ -1,49 +1,78 @@
-## Cobalt Strike (`execute-assembly`) Version
+## Cobalt Strike `execute-assembly` Build
 
-This version is modified to run correctly when executed via **Cobalt Strike’s `execute-assembly`** feature.
+This build is modified to run **cleanly via Cobalt Strike’s `execute-assembly`**.
+It is designed for **in-memory execution** and avoids all filesystem interaction.
 
-### Background
+---
 
-The original implementation loads configuration files directly from disk:
+## Why This Exists
+
+The upstream version reads configuration files from disk.
+When run with `execute-assembly`, this can fail due to:
+
+* No working directory
+* Restricted filesystem access
+* In-memory–only execution context
+* Only a limited set of services in **Config.cs** due to size constraints.
+
+This build removes that dependency entirely.
+
+---
+
+## What Changed
+
+File-based config loading was removed and replaced with **in-memory configuration**.
+
+**Upstream behavior**
+
+* Reads `config_defports.st` and `config_probes.st` from disk
+* Creates files if missing
+
+**This build**
+
+* No file reads or writes
+* Config is initialized in code before execution
 
 ```csharp
-if (!File.Exists("./config_defports.st"))
-    ConfigerHelper.CreateConfigFile("./config_defports.st", false);
-
-if (!File.Exists("./config_probes.st"))
-    ConfigerHelper.CreateConfigFile("./config_probes.st", true);
-
+Config.Initialize();
 m_pc = new ProbeConfiger(
-    File.ReadAllText("./config_probes.st"),
-    File.ReadAllText("./config_defports.st")
+    Config.ConfigProbes,
+    Config.ConfigDefPorts
 );
 ```
 
-This approach does **not work reliably** with `execute-assembly`, since the assembly is executed **in-memory** and may not have access to the filesystem.
+---
 
-### Modification
+## Configuration (Operator Notes)
 
-To ensure compatibility with `execute-assembly`, configuration data is **embedded or initialized in code** instead of being read from disk.
+To control what services and ports are scanned:
 
-The file-loading logic is removed and replaced with in-memory values (or empty strings):
+* `config/config_defports.st`
+  Supported ports and service mappings
 
-```csharp
-m_pc = new ProbeConfiger(
-    "", // probes configuration (in-memory)
-    ""  // default ports configuration (in-memory)
-);
-```
+* `config/config_probes.st`
+  Probe signatures and match rules
 
-### Result
+For `execute-assembly`, **embed these configs directly into the source** or inject them programmatically before initializing `ProbeConfiger`.
 
-* No filesystem access required
-* Compatible with in-memory execution
-* Prevents file creation or read errors
-* Works correctly with Cobalt Strike `execute-assembly`
+---
 
-### Notes
+## Difference from Upstream
 
-If custom probe or port configurations are needed, they should be:
+| Aspect                  | Upstream              | This Build                     |
+| ----------------------- | --------------------- | ------------------------------ |
+| Execution model         | Disk-based            | In-memory                      |
+| Config loading          | Reads `.st` files     | Embedded / initialized in code |
+| File creation           | Yes                   | No                             |
+| `execute-assembly` safe | No                    | Yes                            |
+| OPSEC                   | Weaker (FS artifacts) | Improved                       |
 
-* Embedded directly in the source code, or
-* Passed as parameters before initializing `ProbeConfiger`
+---
+
+## TL;DR
+
+* Safe for `execute-assembly`
+* No filesystem artifacts
+* Better OPSEC
+* Same scanning logic as upstream
+
